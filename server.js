@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
-const mysql = require("mysql2");
+const mysql = require('mysql2/promise'); // Usa mysql2/promise para async/await
+
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -23,21 +24,28 @@ app.use(cors({
 
 
 
-// la conexion  a MySQL
-const db = mysql.createConnection({
-  host: process.env.DB_HOST || "localhost",
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "+julioo+",
-  database: process.env.DB_NAME || "sermex_db"
-});
 
-db.connect(err => {
-  if (err) {
-    console.error(" Error de conexión a MySQL:", err);
-    return;
+async function connectDB() {
+  try {
+    const db = await mysql.createConnection({
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0
+    });
+    console.log("✅ Conectado a MySQL en Railway");
+    return db;
+  } catch (err) {
+    console.error("❌ Error de conexión a MySQL:", err);
+    process.exit(1); // Detiene el servidor si no hay conexión
   }
-  console.log(" Conectado a MySQL");
-});
+}
+
+const db = connectDB(); // Úsalo en tus rutas como db.query()
 
 // Configuración OAuth2 para Gmail
 
