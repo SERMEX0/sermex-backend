@@ -25,10 +25,11 @@ app.use(cors({
 
 // la conexion  a MySQL
 const db = mysql.createConnection({
-  host: process.env.DB_HOST || "localhost",
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "+julioo+",
-  database: process.env.DB_NAME || "sermex_db"
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,  // Asegúrate de agregar esto
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME
 });
 
 db.connect(err => {
