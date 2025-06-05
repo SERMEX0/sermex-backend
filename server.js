@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
-const mysql = require("mysql2");
+const mysql = require('mysql2/promise'); // Usa mysql2/promise para async/await
+
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -27,6 +28,7 @@ app.use(cors({
 
 
 
+
 // la conexion  a MySQL
 const db = mysql.createPool({
   host: process.env.DB_HOST,
@@ -47,6 +49,11 @@ db.connect(err => {
   console.log(" Conectado a MySQL");
 });
 */
+
+
+
+
+
 // Configuración OAuth2 para Gmail
 
 
