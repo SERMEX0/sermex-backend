@@ -103,10 +103,8 @@ app.post("/register", (req, res) => {
 
 // Ruta para enviar correo de garantía
 app.post('/api/enviar-garantia', authenticateToken, async (req, res) => {
-  // Configuración de CORS más permisiva para esta ruta
-  res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
-  res.header('Access-Control-Allow-Methods', 'POST');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+   // ... el resto igual, pero SIN los res.header de CORS aquí
+  
 
   const { vendedorEmail, datosFormulario, documentoBase64, imagenes } = req.body;
   
