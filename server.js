@@ -61,27 +61,42 @@ const transporter = nodemailer.createTransport({
 // 🔐 Ruta de Login
 app.post("/login", (req, res) => {
   const { correo, password } = req.body;
+  console.log("[LOGIN] Intento de acceso para:", correo);
 
   db.query("SELECT * FROM usuarios WHERE correo = ?", [correo], (err, results) => {
-    if (err) return res.status(500).json({ error: "Error en el servidor" });
-    if (results.length === 0) return res.status(401).json({ error: "Usuario no encontrado" });
+    if (err) {
+      console.error("[LOGIN] Error en el servidor:", err);
+      return res.status(500).json({ error: "Error en el servidor" });
+    }
+    if (results.length === 0) {
+      console.warn("[LOGIN] Usuario no encontrado:", correo);
+      return res.status(401).json({ error: "Usuario no encontrado" });
+    }
 
     const user = results[0];
 
     bcrypt.compare(password, user.password, (err, isMatch) => {
-      if (err) return res.status(500).json({ error: "Error al comparar contraseña" });
-      if (!isMatch) return res.status(401).json({ error: "Contraseña incorrecta" });
+      if (err) {
+        console.error("[LOGIN] Error al comparar contraseña:", err);
+        return res.status(500).json({ error: "Error al comparar contraseña" });
+      }
+      if (!isMatch) {
+        console.warn("[LOGIN] Contraseña incorrecta para:", correo);
+        return res.status(401).json({ error: "Contraseña incorrecta" });
+      }
 
       const token = jwt.sign({ id: user.id, correo: user.correo }, process.env.JWT_SECRET || "secreto", { expiresIn: "1h" });
 
+      console.log("[LOGIN] Usuario autenticado correctamente:", correo);
+
       res.json({ 
-  mensaje: "Inicio de sesión exitoso", 
-  token,
-  user: {
-    id: user.id,  // Asegúrate de incluir el ID
-    correo: user.correo
-  }
-});
+        mensaje: "Inicio de sesión exitoso", 
+        token,
+        user: {
+          id: user.id,
+          correo: user.correo
+        }
+      });
     });
   });
 });
