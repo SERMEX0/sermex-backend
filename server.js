@@ -28,14 +28,17 @@ app.use(cors({
 
 
 // la conexion  a MySQL
-const db = mysql.createConnection({
+const db = mysql.createPool({
   host: process.env.DB_HOST,
-  port: process.env.DB_PORT,  // Asegúrate de agregar esto
+  port: process.env.DB_PORT,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME
+  database: process.env.DB_NAME,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 });
-
+/*
 db.connect(err => {
   if (err) {
     console.error(" Error de conexión a MySQL:", err);
@@ -43,7 +46,7 @@ db.connect(err => {
   }
   console.log(" Conectado a MySQL");
 });
-
+*/
 // Configuración OAuth2 para Gmail
 
 
