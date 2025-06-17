@@ -276,6 +276,17 @@ app.get('/test-mail', async (req, res) => {
 });
 
 // Asegúrate que esta ruta esté ANTES del app.listen()
+app.get('/api/logistica', (req, res) => {
+  db.query(
+    `SELECT * FROM logistica ORDER BY fecha_creacion DESC`,
+    (err, results) => {
+      if (err) return res.status(500).json({ error: "Error al consultar" });
+      res.json(results);
+    }
+  );
+});
+
+// Ruta para obtener registros de logistica por correo (esta ya la tienes)
 app.get('/api/logistica/:correo', (req, res) => {
   const { correo } = req.params;
   console.log("Solicitud recibida para correo:", correo); // Para depuración
