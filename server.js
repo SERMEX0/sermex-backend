@@ -312,6 +312,114 @@ app.get('/api/logistica/:correo', (req, res) => {
   );
 });
 
+
+//Nuevo Formulario
+// Ruta para enviar solicitud de documentación/soporte - NUEVA RUTA
+app.post('/api/enviar-solicitud', async (req, res) => {
+  try {
+    const { nombre, correo, telefono, empresa, producto, tipoSolicitud, descripcion, contactoPreferido } = req.body;
+
+    // Validar campos obligatorios
+    if (!nombre || !correo || !telefono || !descripcion) {
+      return res.status(400).json({ error: "Faltan campos obligatorios" });
+    }
+
+    // Definir tipos de solicitud para el correo
+    const tiposSolicitud = [
+      { value: "documentacion", label: "Documentación del producto" },
+      { value: "soporte", label: "Soporte técnico" },
+      { value: "garantia", label: "Solicitud de garantía" },
+      { value: "dudas", label: "Resolución de dudas" },
+      { value: "contacto", label: "Contactar con un especialista" },
+      { value: "otro", label: "Otro tipo de solicitud" }
+    ];
+
+    // Configurar el correo
+    const mailOptions = {
+      from: `"Formulario SERMEX" <${process.env.GMAIL_USER}>`,
+      to: 'julioosvaldoguzmancorrea53@gmail.com', // Tu correo personal
+      subject: `Nueva solicitud: ${tipoSolicitud} - ${nombre}`,
+      html: `
+        <h2>Nueva solicitud recibida</h2>
+        <p><strong>Nombre:</strong> ${nombre}</p>
+        <p><strong>Correo:</strong> ${correo}</p>
+        <p><strong>Teléfono:</strong> ${telefono}</p>
+        <p><strong>Empresa:</strong> ${empresa || 'No especificada'}</p>
+        <p><strong>Producto de interés:</strong> ${producto || 'No especificado'}</p>
+        <p><strong>Tipo de solicitud:</strong> ${tiposSolicitud.find(t => t.value === tipoSolicitud)?.label || tipoSolicitud}</p>
+        <p><strong>Método de contacto preferido:</strong> ${contactoPreferido}</p>
+        <h3>Descripción de la solicitud:</h3>
+        <p>${descripcion}</p>
+        <hr>
+        <p><em>Este mensaje fue enviado desde el formulario de contacto de SERMEX</em></p>
+      `
+    };
+
+     
+
+    // Enviar el correo
+    await transporter.sendMail(mailOptions);
+    
+    res.json({ success: true, message: 'Solicitud enviada correctamente' });
+
+  } catch (error) {
+    console.error('Error al enviar solicitud:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+//Segundo nuevo formulario
+// Ruta para enviar formulario de contacto general
+app.post('/api/enviar-contacto', async (req, res) => {
+  try {
+    const { nombre, correo, empresa, telefono, asunto, tipo, descripcion } = req.body;
+
+    // Validar campos obligatorios
+    if (!nombre || !correo || !telefono || !asunto || !tipo || !descripcion) {
+      return res.status(400).json({ error: "Faltan campos obligatorios" });
+    }
+
+    // Mapear tipos de solicitud
+    const tiposSolicitud = {
+      "soporte": "Problema con producto",
+      "asesoria": "Solicitar asesoría",
+      "experto": "Hablar con un experto",
+      "informacion": "Información",
+      "facturacion": "Facturación",
+      "otro": "Otro"
+    };
+
+    // Configurar el correo
+    const mailOptions = {
+      from: `"Formulario de Contacto SERMEX" <${process.env.GMAIL_USER}>`,
+      to: 'julioosvaldoguzmancorrea53@gmail.com', // Tu correo personal
+      subject: `Contacto: ${asunto} - ${nombre}`,
+      html: `
+        <h2>Nuevo contacto recibido</h2>
+        <p><strong>Nombre:</strong> ${nombre}</p>
+        <p><strong>Correo:</strong> ${correo}</p>
+        <p><strong>Teléfono:</strong> ${telefono}</p>
+        <p><strong>Empresa:</strong> ${empresa || 'No especificada'}</p>
+        <p><strong>Asunto:</strong> ${asunto}</p>
+        <p><strong>Tipo de solicitud:</strong> ${tiposSolicitud[tipo] || tipo}</p>
+        <h3>Descripción:</h3>
+        <p>${descripcion}</p>
+        <hr>
+        <p><em>Este mensaje fue enviado desde el formulario de contacto general de SERMEX</em></p>
+      `
+    };
+
+    // Enviar el correo
+    await transporter.sendMail(mailOptions);
+    
+    res.json({ success: true, message: 'Solicitud de contacto enviada correctamente' });
+
+  } catch (error) {
+    console.error('Error al enviar contacto:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
 // 🚀 Iniciar Servidor
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
@@ -393,6 +501,10 @@ app.put('/api/logistica/actualizar', (req, res) => {
     }
   );
 });
+
+
+
+
 
 // NO incluyas la función borrarCompletados ni el setInterval
 
